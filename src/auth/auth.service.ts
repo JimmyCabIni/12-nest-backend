@@ -1,14 +1,15 @@
 import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 
 import * as bcryptjs from 'bcryptjs';
 
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { RegisterUserDto, LoginDTO, CreateUserDto, UpdateAuthDto} from './dto';
+
 import { User } from './entities/user.entity';
-import { LoginDTO } from './dto/login.dto';
-import { JwtService } from '@nestjs/jwt';
+
+import { LoginResponse } from './interfaces/login-response';
 import { JwtPayload } from './interfaces/jwt-payload';
 
 @Injectable()
@@ -50,7 +51,18 @@ export class AuthService {
     
   }
 
-  async login(loginDTO: LoginDTO) {
+  async register(registerDto: RegisterUserDto): Promise<LoginResponse> {
+    
+    const user = await this.create( registerDto );
+    console.log({user})
+
+    return {
+      user: user,
+      token: this.getJWToken({ id: user._id })
+    }
+  }
+
+  async login(loginDTO: LoginDTO): Promise<LoginResponse>  {
 
     const { email, password } = loginDTO;
 
@@ -70,10 +82,6 @@ export class AuthService {
       token: this.getJWToken({ id: user.id}),
     }
 
-    /**
-     * User {_id, name, email, }
-     * token -> ASF,..ASD.ASDFA.AS
-     */
   }
 
   findAll() {
