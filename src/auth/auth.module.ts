@@ -8,6 +8,8 @@ import { User, UserSchema } from './entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
+  controllers: [AuthController],
+  providers: [AuthService],
   imports: [
     ConfigModule.forRoot(),
     
@@ -17,14 +19,13 @@ import { ConfigModule } from '@nestjs/config';
         schema: UserSchema
       }
     ]),
-
+    
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SEED,
       signOptions: { expiresIn: '6h' },
     }),
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
+  
 })
 export class AuthModule {}
