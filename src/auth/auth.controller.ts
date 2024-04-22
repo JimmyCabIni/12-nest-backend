@@ -3,6 +3,8 @@ import { AuthService } from './auth.service';
 
 import { CreateUserDto, LoginDTO, RegisterUserDto, UpdateAuthDto } from './dto';
 import { AuthGuard } from './guards/auth.guard';
+import { User } from './entities/user.entity';
+import { LoginResponse } from './interfaces/login-response';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +33,19 @@ export class AuthController {
     // return user;
     return this.authService.findAll();
   }
+
+  @UseGuards( AuthGuard )
+  @Get('check-token')
+  checkToken( @Request() req: Request):LoginResponse {
+    
+    const user = req['user'] as User;
+
+    return{
+      user,
+      token: this.authService.getJWToken({ id: user._id })
+    }
+  }
+
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
